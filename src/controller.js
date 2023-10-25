@@ -29,8 +29,13 @@ class LibroController{
     async delete(req, res){
         const libro = req.body;
         try{
-            const [result] = await pool.query(`DELETE FROM Libros WHERE ISBN=(?)`, [libro.ISBN]);
-        res.json({"Regsitros eliminados": result.affectedRows});
+            const [result] = await pool.query(`SELECT * FROM Libros WHERE ISBN=(?)`, [libro.ISBN]);
+            if (result.length > 0) {
+                const [result] = await pool.query(`DELETE FROM Libros WHERE ISBN=(?)`, [libro.ISBN]);
+                res.json({"Regsitros eliminados": result.affectedRows});
+            } else {
+                res.status(404).json({ "Mensaje": "No se encontró el libro con el ISBN especificado" });
+            }
             }
         catch (error){ 
             console.error("Error al eliminar el libro por ISBN:", error);
