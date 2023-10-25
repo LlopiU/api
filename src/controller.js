@@ -23,9 +23,20 @@ class LibroController{
 
     async add(req,res){
         const libro = req.body;
+        try { 
+            if (libro.nombre  && libro.autor  && libro.categoria  && libro.añopublicacion && libro.ISBN ) 
+            {
+                const [result] = await pool.query(`INSERT INTO Libros(nombre, autor, categoria, añopublicacion, ISBN) VALUES (?, ?, ?, ?, ?)`, [libro.nombre, libro.autor, libro.categoria, libro.añopublicacion, libro.ISBN]);
+                res.json({"id insert": result.insertId});
+            } else {
+                res.status(404).json({ "Mensaje": "No se puede registrar campos vacios" });
+            }
+        }
+        catch (error){
+            console.error("Error al agregar libro", error);
+            res.status(500).json({ "Mensaje": "Error en el servidor" });
+        }
         
-        const [result] = await pool.query(`INSERT INTO Libros(nombre, autor, categoria, añopublicacion, ISBN) VALUES (?, ?, ?, ?, ?)`, [libro.nombre, libro.autor, libro.categoria, libro.añopublicacion, libro.ISBN]);
-        res.json({"id insert": result.insertId});
     }
 
     async delete(req, res){
